@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SmartRail AI | Register Controller Account</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
+<body><div class="auth"><form class="card" method="post">
+<div class="center" style="font-size:34px">🛡️</div>
+<h1 class="brand">SmartRail <b>AI</b></h1>
+<div class="sub">REGISTER RAILWAY TRAFFIC CONTROLLER</div>
+{% if error %}<div class="err">{{ error }}</div>{% endif %}
+<label>Full Name</label><input name="name" required>
+<label>Official Email Address</label><input name="email" type="email" required>
+<label>Password</label><input name="password" type="password" minlength="8" required>
+<div class="sub" style="text-align:left;margin-top:6px">🔒 Passwords are salt-hashed with PBKDF2 HMAC-SHA256.</div>
+<label>Confirm Password</label><input name="confirm" type="password" minlength="8" required>
+<button class="full">Create Controller Account</button>
+<p class="center" style="font-size:13px">Already registered as a controller? <a href="{{ url_for('login') }}">Login Here</a></p>
+</form></div></body></html>

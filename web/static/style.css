@@ -1,0 +1,51 @@
+:root{--bg:#050b18;--panel:#0b1630;--panel2:#0f1d3d;--line:#1b2d57;--text:#e6edf8;--muted:#8a9bbd;
+--accent:#1aa7ec;--amber:#f5a524;--ok:#2ecc71;--bad:#ff5d5d;--mono:ui-monospace,Consolas,monospace}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(1200px 600px at 70% -10%,#0d2147 0,var(--bg) 60%);color:var(--text);
+font-family:system-ui,Segoe UI,Roboto,sans-serif;min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+.brand{font-weight:800;letter-spacing:.3px}.brand b{color:var(--accent)}
+.badge{display:inline-block;font:11px var(--mono);padding:3px 10px;border-radius:99px;border:1px solid #6b4a10;
+background:#2a1d06;color:var(--amber)}
+.auth{display:grid;place-items:center;min-height:100vh;padding:16px}
+.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:14px;padding:24px;
+width:100%;max-width:380px}
+.card h1{margin:8px 0 2px;font-size:24px;text-align:center}
+.sub{font:11px var(--mono);color:var(--muted);text-align:center;letter-spacing:1.5px;margin-bottom:10px}
+.center{text-align:center}
+label{display:block;font-size:12px;color:var(--muted);margin:14px 0 6px}
+input,select{width:100%;padding:11px 12px;border-radius:8px;border:1px solid var(--line);background:#07112a;color:var(--text);font-size:14px}
+input:focus,select:focus{outline:2px solid var(--accent);border-color:transparent}
+button,.btn{cursor:pointer;border:0;border-radius:8px;padding:10px 16px;font-weight:700;color:#fff;background:linear-gradient(180deg,#1b9be0,#0b78b8);font-size:14px}
+button.ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
+button.on{background:linear-gradient(180deg,#2fd27a,#1b9e56)}
+button.full{width:100%;margin-top:18px;padding:12px}
+.err{background:#3a1216;border:1px solid #7a2a31;color:#ffb4b4;padding:9px 12px;border-radius:8px;font-size:13px;margin-top:12px}
+.hint{font:12px var(--mono);color:var(--muted);margin-top:16px;padding:10px;border:1px dashed var(--line);border-radius:8px}
+nav{display:flex;align-items:center;gap:18px;padding:14px 24px;border-bottom:1px solid var(--line);background:#07112acc;position:sticky;top:0;backdrop-filter:blur(6px);z-index:5}
+nav .sp{flex:1}nav a.act{color:#fff;border-bottom:2px solid var(--accent);padding-bottom:3px}
+main{padding:20px 24px;max-width:1280px;margin:0 auto}
+.grid{display:grid;gap:16px}.g4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(380px,1fr))}
+.panel{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:12px;padding:16px}
+.panel h3{margin:0 0 12px;font-size:13px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase}
+.kpi .v{font-size:28px;font-weight:800}.kpi .l{font:11px var(--mono);color:var(--muted)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--bad);margin-right:6px}
+.dot.on{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--muted);font:11px var(--mono);padding:6px;border-bottom:1px solid var(--line)}
+td{padding:7px 6px;border-bottom:1px solid #12224a}
+.tag{font:11px var(--mono);padding:2px 8px;border-radius:99px;background:#12284f}
+.EXPRESS{color:#ffd166}.PASSENGER{color:#7cc7ff}.FREIGHT{color:#c7a3ff}
+.log{max-height:300px;overflow:auto;font:12px var(--mono)}
+.log div{padding:4px 0;border-bottom:1px solid #12224a}.log span{color:var(--muted);margin-right:8px}
+.lcd{font:20px var(--mono);background:#9db83a;color:#27300b;padding:12px 14px;border-radius:6px;letter-spacing:3px;line-height:1.5;border:4px solid #1b2306}
+svg text{font:11px var(--mono);fill:#8a9bbd}
+.trk{stroke:#2a3f73;stroke-width:8;fill:none;stroke-linecap:round}
+.trk.live{stroke:var(--accent)}
+.sensor{fill:#2a3f73}.sensor.hit{fill:var(--bad)}
+.train{fill:var(--amber)}
+canvas{max-height:260px}
+.mini{display:grid;grid-template-columns:1fr 1fr 1fr 1.2fr auto;gap:8px;margin-top:12px}
+@media(max-width:640px){main{padding:12px}.mini{grid-template-columns:1fr 1fr}nav{padding:12px}}

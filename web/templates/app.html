@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SmartRail AI | Railway Traffic Monitoring &amp; Control Room</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}"></head>
+<body class="shell">
+<aside id="side">
+  <div class="logo"><span>🚆</span><div><b>SmartRail <i>AI</i></b><small>CONTROL &amp; DISPATCH</small></div></div>
+  <div class="terr">Active Territory: <b>TAMIL NADU (SR)</b></div>
+  <div class="grp">OPERATIONS (FUNCTIONAL)</div>
+  <a data-v="dashboard" href="#dashboard">▦ Dashboard</a>
+  <a data-v="monitoring" href="#monitoring">▤ Live Train Monitoring <em class="live">LIVE</em></a>
+  <div class="grp">ASSET &amp; MOVEMENT CONTROL</div>
+  <a data-v="train-mgmt" href="#train-mgmt">⇄ Train Management</a>
+  <a data-v="station-mgmt" href="#station-mgmt">🏢 Station Management</a>
+  <a data-v="track-mgmt" href="#track-mgmt">⚡ Track Management</a>
+  <a data-v="scheduling" href="#scheduling">🕒 Train Scheduling</a>
+  <div class="grp">INTELLIGENT SYSTEMS</div>
+  <a data-v="ai-dispatch" href="#ai-dispatch">💡 AI Dispatch</a>
+  <a data-v="alerts" href="#alerts">🔔 Alerts &amp; Notifications</a>
+  <a data-v="analytics" href="#analytics">📊 Analytics</a>
+  <a href="{{ url_for('logout') }}" class="out">🚪 Sign Out</a>
+</aside>
+
+<div id="content">
+<header>
+  <button id="burger" class="ghost">☰</button>
+  <div><span class="ttl">Tamil Nadu Central Dispatch</span> <span class="stn" id="hStation"></span>
+    <div class="modeline" id="modeLine">[SIMULATION + LIVE RIG] Tamil Nadu Zone</div></div>
+  <span class="sp"></span>
+  <div class="clock"><b id="clk"></b><small id="dt"></small></div>
+  <div class="usr">👤 {{ name }}<small>CHIEF_CONTROLLER</small></div>
+</header>
+
+<main>
+<!-- ================= DASHBOARD ================= -->
+<section id="v-dashboard" class="view">
+  <div class="filters">
+    <label>DIVISION <select id="fDiv"></select></label>
+    <label>STATION <select id="fStn"></select></label>
+    <label>CATEGORY <select id="fCat"><option value="">All Categories</option></select></label>
+    <button class="ghost" id="bPause">⏸ Pause Simulation</button>
+    <button class="ghost" onclick="openDlg('dSim')">⚙ Simulation Settings</button>
+  </div>
+  <div class="grid g4">
+    <div class="panel kpi"><div class="l">ACTIVE SECTION TRAINS</div><div class="v" id="kActive">0</div><small>Tamil Nadu Division</small></div>
+    <div class="panel kpi"><div class="l">SECTION PUNCTUALITY</div><div class="v" id="kPunc">0%</div><small>Nominal Dispatch</small></div>
+    <div class="panel kpi"><div class="l">AVERAGE TRANSIT DELAY</div><div class="v" id="kDelay">0m</div><small>Within Tolerance</small></div>
+    <div class="panel kpi"><div class="l">SIGNAL INTERLOCKING</div><div class="v" id="kInter">NOMINAL</div><small id="kInterS">All Line Relays Clear</small></div>
+  </div>
+  <div class="panel" style="margin-top:16px">
+    <div class="row"><span class="chip">CTC CONTROL ROOM DISPLAY</span><b id="ctcTitle"></b>
+      <span class="sp"></span><span class="leg"><i style="background:#1aa7ec"></i>Up Main <i style="background:#7a8cb5"></i>Down Main <i style="background:#f5a524"></i>Platform Loops <i style="background:#c7a3ff"></i>Freight Siding</span></div>
+    <svg id="ctc" viewBox="0 0 960 410" width="100%"></svg>
+    <div class="note">Switch 1A / 1B = the physical servo turnout on the ESP32 rig (MAIN = Track 1, LOOP = Track 3). Hover trains for telemetry.</div>
+  </div>
+  <div class="grid g2" style="margin-top:16px">
+    <div class="panel"><div class="tabs" id="subTabs">
+        <button data-t="stn" class="on">🏢 Station Telemetry</button><button data-t="inc">🚆 Incoming Trains</button>
+        <button data-t="trn">📡 Transit Trains</button><button data-t="sch">🕒 Train Schedule</button></div>
+      <div id="subBody"></div></div>
+    <div class="panel"><h3>Track Occupancy &amp; Relays</h3><div id="occ"></div></div>
+  </div>
+  <div class="grid g2" style="margin-top:16px">
+    <div class="panel" id="aiBox"></div>
+    <div class="panel"><h3>ESP32 Rig (Hardware)</h3>
+      <div class="row"><span class="dot" id="dDot"></span><b id="dTxt">Offline</b><span class="sp"></span>
+        <span class="tag" id="rigSw">Switch 1A: MAIN</span><span class="tag" id="rigBlk">BLOCK CLEAR</span></div>
+      <div class="lcd" style="margin:10px 0"><div id="l1">&nbsp;</div><div id="l2">&nbsp;</div></div>
+      <div class="log" id="log"></div></div>
+  </div>
+</section>
+
+<!-- ================= MONITORING ================= -->
+<section id="v-monitoring" class="view"><div class="panel"><h3>Live Train Transit Status</h3>
+  <div class="tblwrap"><table><thead><tr><th>TRAIN</th><th>CATEGORY</th><th>LINE</th><th>ROUTE</th><th>SPEED</th><th>PROGRESS</th><th>ETA</th><th>DELAY</th><th>STATUS</th></tr></thead>
+  <tbody id="monBody"></tbody></table></div></div></section>
+
+<!-- ================= TRAIN MGMT ================= -->
+<section id="v-train-mgmt" class="view"><div class="panel"><div class="row"><h3 style="margin:0">Train Management &amp; RFID Tags</h3><span class="sp"></span>
+  <button onclick="openDlg('dTrain')">+ Add Train</button></div>
+  <p class="note">Scan a tag on the rig: unknown UIDs are auto-registered. Edit the category here and the router uses it (EXPRESS → main, GOODS/FREIGHT → loop).</p>
+  <div class="tblwrap"><table><thead><tr><th>RFID UID</th><th>NUMBER</th><th>NAME</th><th>CATEGORY</th><th></th></tr></thead><tbody id="regBody"></tbody></table></div></div></section>
+
+<!-- ================= STATION MGMT ================= -->
+<section id="v-station-mgmt" class="view"><div class="panel"><h3>Station Management</h3>
+  <div class="tblwrap"><table><thead><tr><th>CODE</th><th>STATION</th><th>DIVISION</th><th>PLATFORMS</th><th>INTERLOCKED TRACKS</th><th>STATUS</th></tr></thead><tbody id="stnBody"></tbody></table></div></div></section>
+
+<!-- ================= TRACK MGMT ================= -->
+<section id="v-track-mgmt" class="view">
+  <div class="grid g2">
+    <div class="panel"><h3>Track Management</h3>
+      <div class="tblwrap"><table><thead><tr><th>TRACK</th><th>NAME</th><th>DIRECTION</th><th>LIMIT</th><th>OCCUPANCY</th></tr></thead><tbody id="trkBody"></tbody></table></div></div>
+    <div class="panel"><h3>Switch 1A – Physical Turnout (SG90 servo)</h3>
+      <div class="row"><span class="tag" id="swNow">MAIN</span><span class="tag" id="modeNow">AUTO</span></div>
+      <div class="row" style="margin-top:12px"><button class="ghost" onclick="api('/api/switch',{pos:'MAIN'})">Set MAIN (Track 1)</button>
+        <button class="ghost" onclick="api('/api/switch',{pos:'LOOP'})">Set LOOP (Track 3)</button>
+        <button class="ghost" id="bMode">Toggle AUTO / MANUAL</button></div>
+      <h3 style="margin-top:18px">Demo Simulator (no hardware needed)</h3>
+      <div class="row"><select id="simTrain" style="width:auto"></select>
+        <button class="ghost" data-sim="rfid">Scan RFID</button><button class="ghost" data-sim="ir1">Trigger IR 1</button><button class="ghost" data-sim="ir2">Trigger IR 2</button></div>
+      <p class="note" id="scanTxt">No RFID scan yet.</p></div>
+  </div></section>
+
+<!-- ================= SCHEDULING ================= -->
+<section id="v-scheduling" class="view"><div class="panel"><div class="row"><h3 style="margin:0">Timetable Adjustments, Platform Assignments &amp; Stops</h3><span class="sp"></span><button class="ghost" onclick="loadSched()">🔄 Refresh Timetable</button></div>
+  <div class="tblwrap"><table><thead><tr><th>TRAIN</th><th>STATION STOP</th><th>ARRIVAL</th><th>DEPARTURE</th><th>PLATFORM</th><th>STOP</th><th>HALT</th><th></th></tr></thead><tbody id="schBody"></tbody></table></div></div></section>
+
+<!-- ================= AI DISPATCH ================= -->
+<section id="v-ai-dispatch" class="view"><div class="panel" id="aiBig"></div>
+  <div class="panel" style="margin-top:16px"><h3>Select Dispatch Protocol</h3>
+    <div class="row"><button id="pAuto" class="ghost">⚡ Option A: Automatic Dispatch</button><button id="pMan" class="ghost">👨‍✈️ Option B: Manual Approval</button></div>
+    <p class="note">Priority score = category weight × 1.5 + punctuality bonus (+20 if the train is the physical RFID train). Higher score keeps the track; the other is diverted via the turnout (Track 1 → 3, Track 2 → 4) or held at the signal.</p></div></section>
+
+<!-- ================= ALERTS ================= -->
+<section id="v-alerts" class="view"><div class="panel"><div class="row"><h3 style="margin:0">Conflicts, Diversions &amp; Signal Holds</h3><span class="sp"></span><button class="ghost" onclick="loadAlerts()">🔄 Refresh Log</button></div>
+  <div class="tblwrap"><table><thead><tr><th>ID</th><th>WINNER</th><th>LOSER</th><th>TYPE</th><th>TIME</th><th>RECOMMENDED ACTION</th><th>STATUS</th><th>BLOCK</th></tr></thead><tbody id="alBody"></tbody></table></div></div></section>
+
+<!-- ================= ANALYTICS ================= -->
+<section id="v-analytics" class="view">
+  <div class="row"><h3 style="margin:0">Visualizations &amp; Historical Performance</h3><span class="sp"></span><button class="ghost" onclick="loadAnalytics()">🔄 Refresh Charts</button></div>
+  <div class="grid g3" style="margin-top:14px">
+    <div class="panel"><h3>A. Train Delay Analysis</h3><canvas id="cA"></canvas></div>
+    <div class="panel"><h3>B. Train Traffic Volume (hourly)</h3><canvas id="cB"></canvas></div>
+    <div class="panel"><h3>C. Punctuality Proportion</h3><canvas id="cC"></canvas></div>
+    <div class="panel"><h3>D. Track Utilization</h3><canvas id="cD"></canvas></div>
+    <div class="panel"><h3>E. Category Breakdown</h3><canvas id="cE"></canvas></div>
+    <div class="panel"><h3>F. Conflict &amp; Diversion Resolution</h3><canvas id="cF"></canvas></div>
+  </div>
+  <div class="panel" style="margin-top:16px"><h3>Physical rig movements (ESP32)</h3><div class="row" id="rigStats"></div>
+    <div class="tblwrap"><table><thead><tr><th>TRAIN</th><th>CATEGORY</th><th>ROUTE</th><th>TRANSIT</th></tr></thead><tbody id="rigBody"></tbody></table></div></div>
+</section>
+</main></div>
+
+<!-- dialogs -->
+<dialog id="dSim"><h3>Simulation Settings</h3>
+  <div class="row"><button class="ghost" onclick="api('/api/sim',{action:'reset'})">🔄 Reset Trains</button>
+    <button class="ghost" onclick="api('/api/sim',{action:'conflict'})">⚠ Trigger Conflict</button>
+    <button class="ghost" onclick="openDlg('dTrain')">+ Add Train</button></div>
+  <div class="row" style="margin-top:12px">Speed: <button class="ghost" onclick="api('/api/sim',{action:'speed',value:1})">1x</button>
+    <button class="ghost" onclick="api('/api/sim',{action:'speed',value:2})">2x</button><button class="ghost" onclick="api('/api/sim',{action:'speed',value:5})">5x</button></div>
+  <div class="row" style="margin-top:16px"><button class="ghost" onclick="this.closest('dialog').close()">Close</button></div></dialog>
+<dialog id="dTrain"><h3>Add Train</h3>
+  <label>RFID UID</label><input id="tUid" placeholder="e.g. 04A1B2C3"><label>Number</label><input id="tNum">
+  <label>Name</label><input id="tName"><label>Category</label><select id="tCat"></select>
+  <div class="row" style="margin-top:14px"><button onclick="saveTrain()">Save</button><button class="ghost" onclick="this.closest('dialog').close()">Cancel</button></div></dialog>
+<dialog id="dSch"><h3>Edit Schedule</h3><input type="hidden" id="sId">
+  <label>Arrival</label><input id="sArr" type="time"><label>Departure</label><input id="sDep" type="time">
+  <label>Platform</label><input id="sPf" type="number" min="1"><label>Halt (min)</label><input id="sHalt" type="number" min="0">
+  <div class="row" style="margin-top:14px"><button onclick="saveSched()">Save</button><button class="ghost" onclick="this.closest('dialog').close()">Cancel</button></div></dialog>
+
+<script src="{{ url_for('static', filename='chart.umd.min.js') }}"></script>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body></html>

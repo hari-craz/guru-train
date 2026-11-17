@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SmartRail AI | Traffic Controller Sign In</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
+<body><div class="auth"><form class="card" method="post">
+<div class="center" style="font-size:34px">🚆</div>
+<h1 class="brand">SmartRail <b>AI</b></h1>
+<div class="sub">INTELLIGENT RAILWAY TRAFFIC CONTROLLER</div>
+<div class="center"><span class="badge">Southern Railway • Tamil Nadu Operations</span></div>
+{% if error %}<div class="err">{{ error }}</div>{% endif %}
+<label>Controller Email Address</label>
+<input name="email" type="email" id="email" placeholder="{{ seed_email }}" required>
+<label>Access Password</label>
+<input name="password" type="password" id="pw" placeholder="Enter controller password" required>
+<button class="full">Sign In to Control Room</button>
+<div class="hint">Quick Test Account:<br>{{ seed_email }}</div>
+<p class="center" style="font-size:13px">Don't have a controller account? <a href="{{ url_for('signup') }}">Sign Up / Register</a></p>
+</form></div></body></html>
